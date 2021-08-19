@@ -160,12 +160,14 @@ class Blockchain(object):
         :param last_hash: <str> The hash of the previous Block
         :return: <bool> True if correct, False if not
         """
-
+        # Encodes string to UTF-8
         guess = f'{last_proof}{proof}{last_hash}'.encode()
-        guess_hash = hashlib.sha256(guess).hexdigest
+        # 'Secure Hash Algorithm' = SHA
+        # Returns the data in hexidecimal format
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        # Return True if guess_hash has 4 leading zeroes
         return guess_hash[:4] == "0000"
 
-    # NEED FINISH
     def resolve_conflicts(self):
         """
         Contains the consensus algorithm. Resolves any conflicts
@@ -214,6 +216,17 @@ blockchain = Blockchain()
 # API route for mining new block
 @app.route('/mine', methods=['GET'])
 def mine():
+    """
+    GET: Request to mine 1 Block
+    
+    :response: 
+        - message: New Block
+        - index: Index of Block
+        - transaction: Block transaction
+        - proof: Proof of Block
+        - previous hash: Hash of previous block
+        """
+
     # We run the proof of work algorithm to get the next proof...
     last_block = blockchain.last_block
     proof = blockchain.proof_of_work(last_block)
@@ -241,6 +254,13 @@ def mine():
 
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
+    """
+    POST: Add transactions to the block
+    
+    :response: 
+        - Transaction added to Block idx
+    """
+
     values = request.get_json()
 
     # Check that the required fields are in the POST'ed data
@@ -257,15 +277,32 @@ def new_transaction():
 # Returns the current chain and chain length
 @app.route('/chain', methods=['GET'])
 def full_chain():
+    """
+    GET: Return current Blockchain
+    
+    :response: 
+        - Current chain
+        - Length of current chain
+    """
+
     response = {
         'chain': blockchain.chain,
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
 
-# registers nodes to blockchain
+# registers new node to blockchain
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
+    """
+    POST: Register a new node which can then be mined
+    Ex. 127.0.0.1:5001
+    
+    :response:
+        - New node added
+        - Current total nodes
+    """
+
     values = request.get_json()
 
     nodes = values.get('nodes')
@@ -284,6 +321,18 @@ def register_nodes():
 # Resolve conflicts and come to consensus on mined block
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
+    """
+    GET: Resolves conflicts between competing nodes
+    
+    :response:
+        IF chain is replaced with new
+            - Chain was replaced
+            - New chain
+        ELSE
+            - Our chain was authoritative
+            - Current chain
+    """
+
     replaced = blockchain.resolve_conflicts()
 
     if replaced:
@@ -302,7 +351,6 @@ def consensus():
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
-
     parser = ArgumentParser()
     parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
     args = parser.parse_args()
