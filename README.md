@@ -9,51 +9,51 @@ I am currently working on a few other versions which I will add upon completion:
 	- Javascript version
 	- Dockerized version
 
-### Flask PostMan API Commands
+## Flask PostMan API Commands
 These are the commands used to interact with the Blockchain via http.
-I am using PostMan as it makes this easy, but you could just as easily curl.
+I am using PostMan as it makes this easy, but you could just as easily use curl.
 
-Mine 1 block on current node
+### Mine 1 block on current node
 GET
 http://localhost:5000/mine
 
-Create a new transaction
+
+### Create a new transaction
 POST
 http://localhost:5000/transactions/new
 
-'''JSON
+```
 {
 	“sender” : “d4ee26eee15148ee92c6cd394edd974e”
 	"recipient": "someone-other-address",
  	"amount": 5
 }
-'''
+```
 
-Examine current chain
+
+### Examine current chain
 
 GET
-
 http://localhost:5000/chain
 
-Register a new node on a different port
+
+### Register a new node on a different port
 
 POST
-
 http://localhost:5000/nodes/register
 
-‘’’JSON
+```
 {
 	“nodes”: [“http://127.0.0.1:5001”]
 }
-‘’’
+```
 
 
-Resolve nodes to find true chain
+### Resolve nodes to find true chain
 
 Note: Longer chain wins
 
 GET
-
 http://localhost:5000/nodes/resolve
 
 
